@@ -4,7 +4,6 @@
 
 package com.mycompany.hibernateexample;
 
-import com.google.protobuf.TextFormat.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Iterator;
@@ -13,7 +12,6 @@ import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
-import org.hibernate.boot.registry.StandardServiceRegistryBuilder;
 import org.hibernate.cfg.Configuration;
 
 /**
@@ -40,12 +38,20 @@ public class HibernateExample {
         } catch (Exception e) {
             e.printStackTrace();
         }
-//      ví dụ về thêm department
         Department department1 = new Department("Department 1", startDate, 10000, 1);
         Department department2 = new Department("Department 2", startDate, 15000, 2);
+        
+//      ví dụ về thêm department
         hb2.addDepartment(department1);
         hb2.addDepartment(department2);
+            
+        // ví dụ về sửa department
+        department1 = new Department("Department 1 da sua", startDate, 15000, 1);
+        department1.setDepartmentID(8);
+        hb2.updateDepartment(department1);
         
+        //ví dụ về xóa department
+        hb2.deleteDepartment(9);
         
         hb2.listDepartment();
     }
@@ -101,7 +107,21 @@ public class HibernateExample {
         } finally {
             session.close();
         }
+    } 
+    public void deleteDepartment(Integer departmentID) {
+        Session session = factory.openSession();
+        Transaction tx = null;
+        try {
+            tx = session.beginTransaction();
+            Department department = (Department) session.get(Department.class, departmentID);
+            session.delete(department);
+            tx.commit();
+        } catch (HibernateException e) {
+            if (tx != null) tx.rollback();
+            e.printStackTrace();
+        } finally {
+            session.close();
+        }
     }
 
-    
 }
